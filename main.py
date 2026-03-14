@@ -1,3 +1,4 @@
+import sys
 from src.maze import Maze
 from src.astar import a_star_search
 
@@ -18,9 +19,15 @@ def mark_path(grid, path):
 
 
 def main():
-    maze = Maze.from_file("mazes/simple_maze.txt")
+    maze_file = "mazes/simple_maze.txt"
 
-    print("Original Maze:")
+    if len(sys.argv) > 1:
+        maze_file = sys.argv[1]
+
+    maze = Maze.from_file(maze_file)
+
+    print(f"Loaded maze: {maze_file}")
+    print("\nOriginal Maze:")
     print_maze(maze.grid)
 
     path, cost, explored = a_star_search(maze)
