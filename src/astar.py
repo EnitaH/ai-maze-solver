@@ -12,7 +12,7 @@ def reconstruct_path(current_node):
 
 
 def a_star_search(maze, heuristic_name="manhattan"):
-    start_node = Node(maze.start)
+    
     goal_position = maze.goal
 
     if heuristic_name == "euclidean":
@@ -20,14 +20,24 @@ def a_star_search(maze, heuristic_name="manhattan"):
     else:
         heuristic_function = manhattan_distance
 
+    start_node = Node(maze.start)
+    start_node.g = 0
+    start_node.h = heuristic_function(maze.start, goal_position)
+    start_node.f = start_node.g + start_node.h
+
     open_list = []
     heapq.heappush(open_list, start_node)
 
     closed_set = set()
+    best_g = {maze.start: 0}
     explored_nodes = 0
 
     while open_list:
         current_node = heapq.heappop(open_list)
+
+        if current_node.position in closed_set:
+            continue
+
         explored_nodes += 1
 
         if current_node.position == goal_position:
@@ -39,18 +49,18 @@ def a_star_search(maze, heuristic_name="manhattan"):
             if neighbor_pos in closed_set:
                 continue
 
-            neighbor_node = Node(neighbor_pos, current_node)
-            neighbor_node.g = current_node.g + 1
-            neighbor_node.h = heuristic_function(neighbor_pos, goal_position)
-            neighbor_node.f = neighbor_node.g + neighbor_node.h
+            tentative_g = current_node.g + 1
 
-            skip_node = False
-            for open_node in open_list:
-                if neighbor_node.position == open_node.position and neighbor_node.g >= open_node.g:
-                    skip_node = True
-                    break
+            if neighbor_pos not in best_g or tentative_g < best_g[neighbor_pos]:
+                best_g[neighbor_pos] = tentative_g
 
-            if not skip_node:
+                neighbor_node = Node(neighbor_pos, current_node)
+                neighbor_node.g = tentative_g
+                neighbor_node.h = heuristic_function(neighbor_pos, goal_position)
+                neighbor_node.f = neighbor_node.g + neighbor_node.h
+
+
+
                 heapq.heappush(open_list, neighbor_node)
 
     return None, None, explored_nodes

@@ -7,7 +7,9 @@ class Node:
         self.f = 0
 
     def __eq__(self, other):
-        return self.position == other.position
+        return isinstance(other, Node) and self.position == other.position
 
     def __lt__(self, other):
+        if self.f == other.f:
+            return self.h < other.h
         return self.f < other.f

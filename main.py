@@ -5,7 +5,7 @@ from src.astar import a_star_search
 
 def print_maze(grid):
     for row in grid:
-        print("".join(row))
+        print(" ".join(row))
 
 
 def mark_path(grid, path):
@@ -18,20 +18,9 @@ def mark_path(grid, path):
     return new_grid
 
 
-def main():
-    maze_file = "mazes/simple_maze.txt"
-    heuristic = "manhattan"
+def run_solver(maze, heuristic):
+    print(f"\n=== Heuristic: {heuristic.capitalize()} ===")
 
-    if len(sys.argv) > 1:
-        maze_file = sys.argv[1]
-
-    if len(sys.argv) > 2:
-        heuristic = sys.argv[2].lower()
-
-    maze = Maze.from_file(maze_file)
-
-    print(f"Loaded maze: {maze_file}")
-    print(f"Heuristic: {heuristic}")
     print("\nOriginal Maze:")
     print_maze(maze.grid)
 
@@ -46,6 +35,25 @@ def main():
     else:
         print("\nNo path found.")
         print(f"Nodes explored: {explored}")
+
+
+def main():
+    maze_file = "mazes/simple_maze.txt"
+
+    if len(sys.argv) > 1:
+        maze_file = sys.argv[1]
+
+    try:
+        maze = Maze.from_file(maze_file)
+        print(f"Loaded maze: {maze_file}")
+
+        run_solver(maze, "manhattan")
+        run_solver(maze, "euclidean")
+
+    except FileNotFoundError:
+        print(f"Error: File '{maze_file}' not found.")
+    except ValueError as error:
+        print(f"Error: {error}")
 
 
 if __name__ == "__main__":

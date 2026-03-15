@@ -7,3 +7,6 @@ def manhattan_distance(current, goal):
 
 def euclidean_distance(current, goal):
     return math.sqrt((current[0] - goal[0]) ** 2 + (current[1] - goal[1]) ** 2)
+
+def zero_heuristic(current, goal):
+    return 0
