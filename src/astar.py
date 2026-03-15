@@ -1,6 +1,6 @@
 import heapq
 from src.node import Node
-from src.heuristics import manhattan_distance
+from src.heuristics import manhattan_distance, euclidean_distance
 
 
 def reconstruct_path(current_node):
@@ -11,9 +11,14 @@ def reconstruct_path(current_node):
     return path[::-1]
 
 
-def a_star_search(maze):
+def a_star_search(maze, heuristic_name="manhattan"):
     start_node = Node(maze.start)
     goal_position = maze.goal
+
+    if heuristic_name == "euclidean":
+        heuristic_function = euclidean_distance
+    else:
+        heuristic_function = manhattan_distance
 
     open_list = []
     heapq.heappush(open_list, start_node)
@@ -36,7 +41,7 @@ def a_star_search(maze):
 
             neighbor_node = Node(neighbor_pos, current_node)
             neighbor_node.g = current_node.g + 1
-            neighbor_node.h = manhattan_distance(neighbor_pos, goal_position)
+            neighbor_node.h = heuristic_function(neighbor_pos, goal_position)
             neighbor_node.f = neighbor_node.g + neighbor_node.h
 
             skip_node = False

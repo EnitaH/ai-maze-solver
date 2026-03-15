@@ -20,17 +20,22 @@ def mark_path(grid, path):
 
 def main():
     maze_file = "mazes/simple_maze.txt"
+    heuristic = "manhattan"
 
     if len(sys.argv) > 1:
         maze_file = sys.argv[1]
 
+    if len(sys.argv) > 2:
+        heuristic = sys.argv[2].lower()
+
     maze = Maze.from_file(maze_file)
 
     print(f"Loaded maze: {maze_file}")
+    print(f"Heuristic: {heuristic}")
     print("\nOriginal Maze:")
     print_maze(maze.grid)
 
-    path, cost, explored = a_star_search(maze)
+    path, cost, explored = a_star_search(maze, heuristic)
 
     if path:
         solved_grid = mark_path(maze.grid, path)
