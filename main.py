@@ -45,7 +45,7 @@ def run_bfs(maze):
     print("\nOriginal Maze:")
     print_maze(maze.grid)
 
-    path, cost, explored = bfs_search(maze)
+    path, cost, explored, _ = bfs_search(maze)
 
     if path:
         solved_grid = mark_path(maze.grid, path)

@@ -15,16 +15,18 @@ def bfs_search(maze):
 
     queue = deque([start_node])
     visited = {maze.start}
-
+    
     explored_nodes = 0
+    explored_order = []
 
     while queue:
         current_node = queue.popleft()
         explored_nodes += 1
+        explored_order.append(current_node.position)
 
         if current_node.position == maze.goal:
             path = reconstruct_path(current_node)
-            return path, len(path) - 1, explored_nodes
+            return path, len(path) - 1, explored_nodes, explored_order
 
         for neighbor in maze.get_neighbors(current_node.position):
 
@@ -32,4 +34,4 @@ def bfs_search(maze):
                 visited.add(neighbor)
                 queue.append(Node(neighbor, current_node))
 
-    return None, None, explored_nodes
+    return None, None, explored_nodes, explored_order

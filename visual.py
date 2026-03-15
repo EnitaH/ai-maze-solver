@@ -3,6 +3,7 @@ import time
 import pygame
 from src.maze import Maze
 from src.astar import a_star_search
+from src.bfs import bfs_search
 from src.maze_generator import generate_random_maze
 
 # Window settings
@@ -47,31 +48,38 @@ def draw_maze(screen, maze, explored_positions, path_positions):
             pygame.draw.rect(screen, LIGHT_GREY, (x, y, CELL_SIZE, CELL_SIZE), 1)
 
 
-def load_maze_from_args():
-    if len(sys.argv) > 1 and sys.argv[1] == "--random":
-        size = 10
-        if len(sys.argv) > 2:
-            size = int(sys.argv[2])
-
-        grid = generate_random_maze(size)
-        maze = Maze(grid)
-        print(f"Generated random maze: {size}x{size}")
-        return maze
-
-    maze_file = "mazes/simple_maze.txt"
-    if len(sys.argv) > 1:
-        maze_file = sys.argv[1]
-
-    maze = Maze.from_file(maze_file)
-    print(f"Loaded maze: {maze_file}")
-    return maze
-
-
 def handle_quit_events():
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+
+
+def load_maze_and_algorithm():
+    algorithm = "astar"
+    heuristic = "manhattan"
+
+    if len(sys.argv) > 1 and sys.argv[1] == "--random":
+        size = 10
+        if len(sys.argv) > 2:
+            size = int(sys.argv[2])
+        if len(sys.argv) > 3:
+            algorithm = sys.argv[3].lower()
+
+        grid = generate_random_maze(size)
+        maze = Maze(grid)
+        print(f"Generated random maze: {size}x{size}")
+        return maze, algorithm, heuristic
+
+    maze_file = "mazes/simple_maze.txt"
+    if len(sys.argv) > 1:
+        maze_file = sys.argv[1]
+    if len(sys.argv) > 2:
+        algorithm = sys.argv[2].lower()
+
+    maze = Maze.from_file(maze_file)
+    print(f"Loaded maze: {maze_file}")
+    return maze, algorithm, heuristic
 
 
 def animate_exploration(screen, maze, explored_order):
@@ -110,11 +118,23 @@ def animate_path(screen, maze, explored_positions, path):
 
     return path_positions
 
+def run_algorithm(maze, algorithm, heuristic):
+    if algorithm == "bfs":
+        path, cost, explored, explored_order = bfs_search(maze)
+        return path, cost, explored, explored_order
+
+    path, cost, explored, explored_order = a_star_search(maze, heuristic)
+    return path, cost, explored, explored_order
 
 def main():
     try:
-        maze = load_maze_from_args()
-        path, cost, explored, explored_order = a_star_search(maze, "manhattan")
+        maze, algorithm, heuristic = load_maze_and_algorithm()
+
+        path, cost, explored, explored_order = run_algorithm(maze, algorithm, heuristic)
+
+        print(f"Algorithm: {algorithm.upper()}")
+        if algorithm == "astar":
+            print(f"Heuristic: {heuristic}")
 
         if path:
             print(f"Path cost: {cost}")
@@ -127,8 +147,7 @@ def main():
         width = maze.cols * (CELL_SIZE + MARGIN) - MARGIN
         height = maze.rows * (CELL_SIZE + MARGIN) - MARGIN
         screen = pygame.display.set_mode((width, height))
-        pygame.display.set_caption("AI Maze Solver - A* Visualizer")
-
+        pygame.display.set_caption(f"AI Maze Solver - {algorithm.upper()} Visualizer")
 
         screen.fill(BACKGROUND)
         draw_maze(screen, maze, set(), set())
