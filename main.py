@@ -2,6 +2,7 @@ import sys
 from src.maze import Maze
 from src.astar import a_star_search
 from src.maze_generator import generate_random_maze
+from src.bfs import bfs_search
 
 
 def print_maze(grid):
@@ -20,12 +21,31 @@ def mark_path(grid, path):
 
 
 def run_solver(maze, heuristic):
-    print(f"\n=== Heuristic: {heuristic.capitalize()} ===")
+    print(f"\n=== Algorithm: A* ({heuristic.capitalize()}) ===")
 
     print("\nOriginal Maze:")
     print_maze(maze.grid)
 
     path, cost, explored = a_star_search(maze, heuristic)
+
+    if path:
+        solved_grid = mark_path(maze.grid, path)
+        print("\nSolved Maze:")
+        print_maze(solved_grid)
+        print(f"\nPath cost: {cost}")
+        print(f"Nodes explored: {explored}")
+    else:
+        print("\nNo path found.")
+        print(f"Nodes explored: {explored}")
+
+
+def run_bfs(maze):
+    print("\n=== Algorithm: BFS ===")
+
+    print("\nOriginal Maze:")
+    print_maze(maze.grid)
+
+    path, cost, explored = bfs_search(maze)
 
     if path:
         solved_grid = mark_path(maze.grid, path)
@@ -62,6 +82,8 @@ def main():
 
         run_solver(maze, "manhattan")
         run_solver(maze, "euclidean")
+        run_bfs(maze)
+
 
     except FileNotFoundError:
         print(f"Error: File '{maze_file}' not found.")
