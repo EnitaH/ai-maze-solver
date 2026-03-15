@@ -1,6 +1,7 @@
 import sys
 from src.maze import Maze
 from src.astar import a_star_search
+from src.maze_generator import generate_random_maze
 
 
 def print_maze(grid):
@@ -38,14 +39,26 @@ def run_solver(maze, heuristic):
 
 
 def main():
-    maze_file = "mazes/simple_maze.txt"
-
-    if len(sys.argv) > 1:
-        maze_file = sys.argv[1]
-
     try:
-        maze = Maze.from_file(maze_file)
-        print(f"Loaded maze: {maze_file}")
+        if len(sys.argv) > 1 and sys.argv[1] == "--random":
+            size = 10
+
+            if len(sys.argv) > 2:
+                size = int(sys.argv[2])
+
+            grid = generate_random_maze(size)
+            maze = Maze(grid)
+
+            print(f"Generated random maze: {size}x{size}")
+
+        else:
+            maze_file = "mazes/simple_maze.txt"
+
+            if len(sys.argv) > 1:
+                maze_file = sys.argv[1]
+
+            maze = Maze.from_file(maze_file)
+            print(f"Loaded maze: {maze_file}")
 
         run_solver(maze, "manhattan")
         run_solver(maze, "euclidean")
