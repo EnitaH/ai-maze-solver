@@ -2,35 +2,35 @@ import random
 
 
 def generate_random_maze(size=10, wall_probability=0.3):
-    grid = []
+    # Start with all open cells
+    grid = [["." for _ in range(size)] for _ in range(size)]
 
-    for row in range(size):
-        current_row = []
+    # Set start and goal
+    grid[0][0] = "S"
+    grid[size - 1][size - 1] = "G"
 
-        for col in range(size):
+    # Create a guaranteed path from S to G
+    row, col = 0, 0
+    path_cells = {(row, col)}
 
-            if (row, col) == (0, 0):
-                current_row.append("S")
-
-            elif (row, col) == (size - 1, size - 1):
-                current_row.append("G")
-
+    while row < size - 1 or col < size - 1:
+        if row == size - 1:
+            col += 1
+        elif col == size - 1:
+            row += 1
+        else:
+            if random.choice([True, False]):
+                row += 1
             else:
+                col += 1
+
+        path_cells.add((row, col))
+
+    # Add random walls everywhere except the guaranteed path, start, and goal
+    for r in range(size):
+        for c in range(size):
+            if (r, c) not in path_cells and (r, c) != (0, 0) and (r, c) != (size - 1, size - 1):
                 if random.random() < wall_probability:
-                    current_row.append("#")
-                else:
-                    current_row.append(".")
-
-        grid.append(current_row)
-
-    # ensure start neighbors are open
-    if size > 1:
-        grid[0][1] = "."
-        grid[1][0] = "."
-
-    # ensure goal neighbors are open
-    if size > 1:
-        grid[size-1][size-2] = "."
-        grid[size-2][size-1] = "."
+                    grid[r][c] = "#"
 
     return grid
