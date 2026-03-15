@@ -26,7 +26,7 @@ def run_solver(maze, heuristic):
     print("\nOriginal Maze:")
     print_maze(maze.grid)
 
-    path, cost, explored = a_star_search(maze, heuristic)
+    path, cost, explored, _ = a_star_search(maze, heuristic)
 
     if path:
         solved_grid = mark_path(maze.grid, path)

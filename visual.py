@@ -8,7 +8,8 @@ from src.maze_generator import generate_random_maze
 # Window settings
 CELL_SIZE = 40
 MARGIN = 2
-ANIMATION_DELAY = 0.10  # seconds between path steps
+EXPLORATION_DELAY = 0.03
+PATH_DELAY = 0.08
 
 # Colors
 WHITE = (255, 255, 255)
@@ -16,11 +17,12 @@ BLACK = (30, 30, 30)
 GREEN = (50, 200, 100)
 RED = (220, 60, 60)
 BLUE = (70, 130, 255)
+YELLOW = (255, 215, 0)
 LIGHT_GREY = (200, 200, 200)
 BACKGROUND = (240, 240, 240)
 
 
-def draw_maze(screen, maze, path_positions):
+def draw_maze(screen, maze, explored_positions, path_positions):
     for row in range(maze.rows):
         for col in range(maze.cols):
             cell = maze.grid[row][col]
@@ -36,6 +38,8 @@ def draw_maze(screen, maze, path_positions):
                 color = RED
             elif (row, col) in path_positions:
                 color = BLUE
+            elif (row, col) in explored_positions:
+                color = YELLOW
             else:
                 color = WHITE
 
@@ -63,33 +67,54 @@ def load_maze_from_args():
     return maze
 
 
-def animate_path(screen, maze, path):
+def handle_quit_events():
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+
+def animate_exploration(screen, maze, explored_order):
+    explored_positions = set()
+
+    for position in explored_order:
+        if maze.grid[position[0]][position[1]] not in ("S", "G"):
+            explored_positions.add(position)
+
+        screen.fill(BACKGROUND)
+        draw_maze(screen, maze, explored_positions, set())
+        pygame.display.flip()
+
+        handle_quit_events()
+        time.sleep(EXPLORATION_DELAY)
+
+    return explored_positions
+
+
+def animate_path(screen, maze, explored_positions, path):
     path_positions = set()
 
     if not path:
-        return
+        return path_positions
 
     for position in path:
         if maze.grid[position[0]][position[1]] not in ("S", "G"):
             path_positions.add(position)
 
         screen.fill(BACKGROUND)
-        draw_maze(screen, maze, path_positions)
+        draw_maze(screen, maze, explored_positions, path_positions)
         pygame.display.flip()
 
-        # Keep window responsive during animation
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+        handle_quit_events()
+        time.sleep(PATH_DELAY)
 
-        time.sleep(ANIMATION_DELAY)
+    return path_positions
 
 
 def main():
     try:
         maze = load_maze_from_args()
-        path, cost, explored = a_star_search(maze, "manhattan")
+        path, cost, explored, explored_order = a_star_search(maze, "manhattan")
 
         if path:
             print(f"Path cost: {cost}")
@@ -104,26 +129,21 @@ def main():
         screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("AI Maze Solver - A* Visualizer")
 
-        # Show maze before animation starts
+
         screen.fill(BACKGROUND)
-        draw_maze(screen, maze, set())
+        draw_maze(screen, maze, set(), set())
         pygame.display.flip()
-        pygame.time.wait(500)
+        pygame.time.wait(400)
 
-        # Animate solved path
-        animate_path(screen, maze, path)
-
-        # Keep final screen open
-        final_path_positions = set(path) if path else set()
+        explored_positions = animate_exploration(screen, maze, explored_order)
+        final_path_positions = animate_path(screen, maze, explored_positions, path)
 
         running = True
         while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
+            handle_quit_events()
 
             screen.fill(BACKGROUND)
-            draw_maze(screen, maze, final_path_positions)
+            draw_maze(screen, maze, explored_positions, final_path_positions)
             pygame.display.flip()
 
         pygame.quit()

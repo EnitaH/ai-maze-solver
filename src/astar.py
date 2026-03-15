@@ -31,6 +31,7 @@ def a_star_search(maze, heuristic_name="manhattan"):
     closed_set = set()
     best_g = {maze.start: 0}
     explored_nodes = 0
+    explored_order = []
 
     while open_list:
         current_node = heapq.heappop(open_list)
@@ -39,9 +40,10 @@ def a_star_search(maze, heuristic_name="manhattan"):
             continue
 
         explored_nodes += 1
+        explored_order.append(current_node.position)
 
         if current_node.position == goal_position:
-            return reconstruct_path(current_node), current_node.g, explored_nodes
+            return reconstruct_path(current_node), current_node.g, explored_nodes, explored_order
 
         closed_set.add(current_node.position)
 
@@ -63,4 +65,4 @@ def a_star_search(maze, heuristic_name="manhattan"):
 
                 heapq.heappush(open_list, neighbor_node)
 
-    return None, None, explored_nodes
+    return None, None, explored_nodes, explored_order
