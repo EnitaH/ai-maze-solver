@@ -266,16 +266,12 @@ def main():
 
             elif action == "astar":
                 algorithm = "astar"
-                maze = build_maze(random_mode, rows, cols, maze_file)
-                screen = resize_window_for_maze(maze)
                 cost, explored, explored_positions, final_path_positions = solve_and_animate(
                     screen, maze, algorithm, heuristic, random_mode, rows, cols
                 )
 
             elif action == "bfs":
                 algorithm = "bfs"
-                maze = build_maze(random_mode, rows, cols, maze_file)
-                screen = resize_window_for_maze(maze)
                 cost, explored, explored_positions, final_path_positions = solve_and_animate(
                     screen, maze, algorithm, heuristic, random_mode, rows, cols
                 )
