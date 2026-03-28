@@ -78,6 +78,7 @@ def draw_stats_panel(screen, maze, algorithm, heuristic, cost, explored, random_
         ("Controls:", font_title),
         ("A - Switch to A*", font_text),
         ("B - Switch to BFS", font_text),
+        ("H - Switch heuristic", font_text),
         ("R - New random maze", font_text),
         ("ESC - Quit", font_text),
         ("", font_text),
@@ -106,6 +107,8 @@ def handle_events():
                 return "bfs"
             if event.key == pygame.K_r:
                 return "random"
+            if event.key == pygame.K_h:
+                return "heuristic"
 
     return None
 
@@ -244,6 +247,12 @@ def solve_and_animate(screen, maze, algorithm, heuristic, random_mode, rows, col
     return cost, explored, explored_positions, final_path_positions
 
 
+def toggle_heuristic(current_heuristic):
+    if current_heuristic == "manhattan":
+        return "euclidean"
+    return "manhattan"
+
+
 def main():
     try:
         random_mode, rows, cols, maze_file, algorithm, heuristic = load_initial_config()
@@ -275,6 +284,13 @@ def main():
                 cost, explored, explored_positions, final_path_positions = solve_and_animate(
                     screen, maze, algorithm, heuristic, random_mode, rows, cols
                 )
+
+            elif action == "heuristic":
+                if algorithm == "astar":
+                    heuristic = toggle_heuristic(heuristic)
+                    cost, explored, explored_positions, final_path_positions = solve_and_animate(
+                        screen, maze, algorithm, heuristic, random_mode, rows, cols
+                    )
 
             elif action == "random":
                 random_mode = True
